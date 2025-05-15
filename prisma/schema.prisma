@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Marca {
+  id       Int       @id @default(autoincrement())
+  nome     String    @db.VarChar(30)
+  produtos Produto[]
+
+  @@map("marcas")
+}
+
+model Produto {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(50)
+  categoria String   @db.VarChar(30)
+  descricao String?
+  preco     Decimal  @db.Decimal(10, 2)
+  estoque   Int
+  imagem    String
+  destaque  Boolean  @default(false)
+  marcaId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  marca     Marca    @relation(fields: [marcaId], references: [id])
+  imagens   Imagem[] @relation("ProdutoToImagem")
+
+  @@map("produtos")
+}
+
+
+model Imagem {
+  id          Int       @id @default(autoincrement())
+  descricao   String    @db.VarChar(30)
+  url         String    @db.VarChar(255)
+  produto     Produto   @relation("ProdutoToImagem", fields: [produtoId], references: [id])
+  produtoId   Int
+  @@map("imagens")
+}
