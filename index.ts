@@ -1,7 +1,11 @@
 import express from 'express'
 import cors from 'cors'
-import routeProdutos from './routes/produtos' // Corrigido o nome da importação
-import routeImagens from './routes/imagens' // Corrigido o nome da importação
+import routesProdutos from './routes/produtos'
+import routesImagens from './routes/imagens'
+import routesClientes from './routes/Clientes'
+import routesLogin from './routes/login'
+import routesComentarios from './routes/comentarios'
+import routesMarcas from './routes/marcas'
 
 const app = express()
 const port = 3001
@@ -9,11 +13,15 @@ const port = 3001
 app.use(express.json())
 app.use(cors())
 
-app.use("/produtos", routeProdutos) // Corrigido o nome da variável usada
-app.use("/imagens", routeImagens) // Corrigido o nome da variável us
+app.use("/produtos", routesProdutos)
+app.use("/imagens", routesImagens)
+app.use("/clientes", routesClientes)
+app.use("/clientes/login", routesLogin)
+app.use("/comentarios", routesComentarios)
+app.use("/marcas", routesMarcas)
 
 app.get('/', (req, res) => {
-  res.send('API: Eletron Pulse')
+  res.send('API: Loja de Eletrônicos')
 })
 
 app.listen(port, () => {
