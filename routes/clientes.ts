@@ -83,6 +83,13 @@ router.post("/", async (req, res) => {
     return
   }
 
+  // Verifica se já existe cliente com o mesmo e-mail
+  const clienteExistente = await prisma.cliente.findUnique({ where: { email: valida.data.email } })
+  if (clienteExistente) {
+    res.status(400).json({ erro: "E-mail já cadastrado no sistema." })
+    return
+  }
+
   const erros = validaSenha(valida.data.senha)
   if (erros.length > 0) {
     res.status(400).json({ erro: erros.join("; ") })

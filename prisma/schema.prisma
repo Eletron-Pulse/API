@@ -47,7 +47,7 @@ model Imagem {
 model Cliente {
   id            String   @db.VarChar(36) @id @default(uuid())
   nome          String   @db.VarChar(60)
-  email         String   @db.VarChar(40)
+  email         String   @unique @db.VarChar(40)
   senha         String   @db.VarChar(60)   // senha deve ser varchar(60)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt  
