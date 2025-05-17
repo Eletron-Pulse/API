@@ -49,6 +49,7 @@ model Cliente {
   nome          String   @db.VarChar(60)
   email         String   @unique @db.VarChar(40)
   senha         String   @db.VarChar(60)   // senha deve ser varchar(60)
+  recoveryCode  String?  @db.VarChar(10)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt  
   comentarios   Comentario[]

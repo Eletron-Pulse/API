@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client"
 import { Router } from "express"
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
+import nodemailer from 'nodemailer'
 
 const prisma = new PrismaClient()
 const router = Router()
@@ -125,6 +126,65 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     res.status(400).json(error)
   }
+})
+
+// Rota para solicitar recuperação de senha
+router.post("/recuperar-senha", async (req, res) => {
+  const { email } = req.body
+  if (!email) {
+    res.status(400).json({ erro: "Informe o e-mail do cliente" })
+    return
+  }
+  const cliente = await prisma.cliente.findUnique({ where: { email } })
+  if (!cliente) {
+    res.status(400).json({ erro: "E-mail não encontrado" })
+    return
+  }
+  // Gera código de 6 dígitos
+  const codigo = Math.floor(100000 + Math.random() * 900000).toString()
+  await prisma.cliente.update({ where: { email }, data: { recoveryCode: codigo } })
+  // Envia e-mail
+  const transporter = nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 587,
+    secure: false,
+    auth: { user: "968f0dd8cc78d9", pass: "89ed8bfbf9b7f9" }
+  })
+  await transporter.sendMail({
+    from: 'sualoja@email.com',
+    to: email,
+    subject: "Recuperação de senha - Loja de Eletrônicos",
+    text: `Seu código de recuperação é: ${codigo}`,
+    html: `<h3>Seu código de recuperação é: <b>${codigo}</b></h3>`
+  })
+  res.status(200).json({ mensagem: "Código de recuperação enviado para o e-mail." })
+})
+
+// Rota para alterar senha usando código de recuperação
+router.post("/alterar-senha", async (req, res) => {
+  const { email, codigo, novaSenha, repetirSenha } = req.body
+  if (!email || !codigo || !novaSenha || !repetirSenha) {
+    res.status(400).json({ erro: "Preencha todos os campos" })
+    return
+  }
+  if (novaSenha !== repetirSenha) {
+    res.status(400).json({ erro: "As senhas não conferem" })
+    return
+  }
+  const cliente = await prisma.cliente.findUnique({ where: { email } })
+  if (!cliente || cliente.recoveryCode !== codigo) {
+    res.status(400).json({ erro: "Código de recuperação inválido" })
+    return
+  }
+  const erros = validaSenha(novaSenha)
+  if (erros.length > 0) {
+    res.status(400).json({ erro: erros.join("; ") })
+    return
+  }
+  const salt = bcrypt.genSaltSync(12)
+  const hash = bcrypt.hashSync(novaSenha, salt)
+  await prisma.cliente.update({ where: { email }, data: { senha: hash, recoveryCode: null } })
+  res.status(200).json({ mensagem: "Senha alterada com sucesso!" })
 })
 
 export default router
