@@ -21,16 +21,21 @@ router.get("/", async (req, res) => {
       },
     })
     res.status(200).json(imagens)
-  } catch (error) {
-    res.status(500).json({ erro: error })
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(500).json({ erro: mensagem })
   }
 })
 
 // Configuração do Cloudinary
 cloudinary.config({
-  cloud_name: 'dvfcxadyh',
-  api_key: '626956919255949',
-  api_secret: '_7K5oKKtDfTGhTixH8IMVB1LPoI',
+  cloud_name: 'dqgbg9e48',
+  api_key: '821218884763488',
+  api_secret: 'UOJ0mKTsZpirM6-w45gCpE99r_8',
 })
 
 const storage = new CloudinaryStorage({
@@ -66,8 +71,14 @@ router.post("/", upload.single('imagem'), async (req, res) => {
       data: { descricao, produtoId, url: urlImagem },
     })
     res.status(201).json(imagem)
-  } catch (error) {
-    res.status(400).json({ error })
+  } catch (error: any) {
+    console.error('Erro ao cadastrar imagem:', error)
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
@@ -79,8 +90,13 @@ router.delete("/:id", async (req, res) => {
       where: { id: Number(id) },
     })
     res.status(200).json(imagem)
-  } catch (error) {
-    res.status(400).json({ erro: error })
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
