@@ -80,7 +80,7 @@ router.post("/", async (req, res) => {
 
   const valida = clienteSchema.safeParse(req.body)
   if (!valida.success) {
-    res.status(400).json({ erro: valida.error })
+    res.status(400).json({ erro: valida.error.errors.map(e => e.message).join('; ') })
     return
   }
 
@@ -144,20 +144,29 @@ router.post("/recuperar-senha", async (req, res) => {
   const codigo = Math.floor(100000 + Math.random() * 900000).toString()
   await prisma.cliente.update({ where: { email }, data: { recoveryCode: codigo } })
   // Envia e-mail
+  console.log('Preparando para enviar e-mail de recuperação para:', email)
   const transporter = nodemailer.createTransport({
     host: "sandbox.smtp.mailtrap.io",
-    port: 587,
+    port: 465,
     secure: false,
-    auth: { user: "968f0dd8cc78d9", pass: "89ed8bfbf9b7f9" }
+    auth: { user: "24de1d54b385f4", pass: "e50818f155a231" },
+    connectionTimeout: 10000,
+    tls: { rejectUnauthorized: false }
   })
-  await transporter.sendMail({
-    from: 'sualoja@email.com',
-    to: email,
-    subject: "Recuperação de senha - Loja de Eletrônicos",
-    text: `Seu código de recuperação é: ${codigo}`,
-    html: `<h3>Seu código de recuperação é: <b>${codigo}</b></h3>`
-  })
-  res.status(200).json({ mensagem: "Código de recuperação enviado para o e-mail." })
+  try {
+    await transporter.sendMail({
+      from: 'sualoja@email.com',
+      to: email,
+      subject: "Recuperação de senha - Loja de Eletrônicos",
+      text: `Seu código de recuperação é: ${codigo}`,
+      html: `<h3>Seu código de recuperação é: <b>${codigo}</b></h3>`
+    })
+    console.log('E-mail enviado com sucesso para:', email)
+    res.status(200).json({ mensagem: "Código de recuperação enviado para o e-mail." })
+  } catch (err) {
+    console.error('Erro ao enviar e-mail:', err)
+    res.status(500).json({ erro: "Erro ao enviar e-mail de recuperação. Tente novamente mais tarde." })
+  }
 })
 
 // Rota para alterar senha usando código de recuperação
