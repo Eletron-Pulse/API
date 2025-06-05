@@ -130,13 +130,12 @@ router.get("/pesquisa/:termo", async (req, res) => {
   }
 })
 
-
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const produto = await prisma.produto.findUnique({
       where: { id: Number(id) },
-      include: { marca: true },
+      include: { marca: true, imagens: true },
     });
     if (!produto) {
       return res.status(404).json({ erro: "Produto não encontrado" });
