@@ -22,15 +22,20 @@ router.get("/", async (req, res) => {
       orderBy: { id: 'desc'}
     })
     res.status(200).json(comentarios)
-  } catch (error) {
-    res.status(400).json(error)
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
 router.post("/", async (req, res) => {
   const valida = comentarioSchema.safeParse(req.body)
   if (!valida.success) {
-    res.status(400).json({ erro: valida.error })
+    res.status(400).json({ erro: valida.error.errors.map(e => e.message).join('; ') })
     return
   }
   const { clienteId, produtoId, texto } = valida.data
@@ -40,8 +45,13 @@ router.post("/", async (req, res) => {
       data: { clienteId, produtoId, texto }
     })
     res.status(201).json(comentario)
-  } catch (error) {
-    res.status(400).json(error)
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
@@ -99,8 +109,13 @@ router.patch("/:id", async (req, res) => {
       resposta)
 
     res.status(200).json(comentario)
-  } catch (error) {
-    res.status(400).json(error)
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
@@ -114,8 +129,13 @@ router.get("/:clienteId", async (req, res) => {
       }
     })
     res.status(200).json(comentarios)
-  } catch (error) {
-    res.status(400).json(error)
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
@@ -126,8 +146,13 @@ router.delete("/:id", async (req, res) => {
       where: { id: Number(id) }
     })
     res.status(200).json(comentario)
-  } catch (error) {
-    res.status(400).json(error)
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 

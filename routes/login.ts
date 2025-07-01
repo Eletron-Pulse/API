@@ -50,8 +50,13 @@ router.post("/", async (req, res) => {
     } else {
       res.status(400).json({ erro: mensaPadrao })
     }
-  } catch (error) {
-    res.status(400).json(error)
+  } catch (error: any) {
+    let mensagem = 'Erro desconhecido.'
+    if (typeof error === 'string') mensagem = error
+    else if (error?.message) mensagem = error.message
+    else if (error?.meta?.cause) mensagem = error.meta.cause
+    else mensagem = JSON.stringify(error)
+    res.status(400).json({ erro: mensagem })
   }
 })
 
