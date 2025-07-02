@@ -25,9 +25,11 @@ model Produto {
   imagem    String
   destaque  Boolean  @default(false)
   marcaId   Int
+  adminId   String?  @db.VarChar(36)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   marca     Marca    @relation(fields: [marcaId], references: [id])
+  admin     Admin?   @relation(fields: [adminId], references: [id])
   imagens   Imagem[] @relation("ProdutoToImagem")
   comentarios Comentario[]
   @@map("produtos")
@@ -66,5 +68,20 @@ model Comentario {
   resposta    String?   @db.VarChar(255)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  admin       Admin?    @relation(fields: [adminId], references: [id])
+  adminId     String?   @db.VarChar(36)
   @@map("comentarios")
+}
+
+model Admin {
+  id            String       @db.VarChar(36) @id @default(uuid())
+  nome          String       @db.VarChar(60)
+  email         String       @unique @db.VarChar(40)
+  senha         String       @db.VarChar(60)   // senha deve ser varchar(60)
+  nivel         Int          @db.SmallInt @default(2)  // 1=Super Admin, 2=Admin, 3=Moderador
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt  
+  produtos      Produto[]    // Admin pode cadastrar produtos
+  comentarios   Comentario[] // Admin pode responder comentários
+  @@map("admins")
 }

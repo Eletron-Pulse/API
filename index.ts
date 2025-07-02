@@ -6,6 +6,8 @@ import routesClientes from './routes/Clientes'
 import routesLogin from './routes/login'
 import routesComentarios from './routes/comentarios'
 import routesMarcas from './routes/marcas'
+import routesDashboard from './routes/dashboard'
+import routesAdmin from './routes/admins'
 
 const app = express()
 const port = 3001
@@ -19,6 +21,8 @@ app.use("/clientes", routesClientes)
 app.use("/clientes/login", routesLogin)
 app.use("/comentarios", routesComentarios)
 app.use("/marcas", routesMarcas)
+app.use("/dashboard", routesDashboard)
+app.use("/admins", routesAdmin) // Apenas /admins (sem /admin)
 
 app.get('/', (req, res) => {
   res.send('API: Loja de Eletrônicos')
